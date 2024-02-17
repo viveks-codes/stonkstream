@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 import pandas as pd
-import base64
 import matplotlib
 matplotlib.use('Agg') 
 
@@ -52,10 +51,6 @@ def plot_candlestick_to_pdf(symbol, start_date, end_date, interval='1h', emas=(1
     except Exception as e:
         st.write(f"Error processing symbol {symbol}: {str(e)}")
 
-def list_csv_files():
-    csv_files = [f for f in os.listdir() if f.endswith('.csv')]
-    return csv_files
-
 def parse_emas_input(input_string):
     if not input_string.strip():  # If the input is empty, use default values
         return [10, 50, 100]
@@ -72,19 +67,24 @@ def parse_date_input(date_string, default_date):
 def main():
     st.title("Candlestick Chart Generator")
 
-    csv_files = list_csv_files()
+    uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
 
-    if not csv_files:
-        st.write("No CSV files found in the current directory.")
-        return
+    if uploaded_file is not None:
+        csv_file = uploaded_file
+    else:
+        csv_files = [f for f in os.listdir() if f.endswith('.csv')]
 
-    st.write("List of CSV files in the current directory:")
-    for i, csv_file in enumerate(csv_files, start=1):
-        st.write(f"{i}. {csv_file}")
+        if not csv_files:
+            st.write("No CSV files found in the current directory.")
+            return
 
-    selected_index = st.number_input(f"Choose a CSV file (1-{len(csv_files)}): ", min_value=1, max_value=len(csv_files), value=1) - 1
+        st.write("List of CSV files in the current directory:")
+        for i, csv_file in enumerate(csv_files, start=1):
+            st.write(f"{i}. {csv_file}")
 
-    csv_file = csv_files[selected_index]
+        selected_index = st.number_input(f"Choose a CSV file (1-{len(csv_files)}): ", min_value=1, max_value=len(csv_files), value=1) - 1
+        csv_file = csv_files[selected_index]
+
     default_start_date = (datetime.now() - timedelta(days=200)).strftime('%Y-%m-%d')
     start_date = parse_date_input(st.text_input(f"Enter start date (YYYY-MM-DD, default: {default_start_date}): ", value=default_start_date), default_start_date)
     end_date = parse_date_input(st.text_input(f"Enter end date (YYYY-MM-DD, default: {datetime.now().strftime('%Y-%m-%d')}): ", value=datetime.now().strftime('%Y-%m-%d')), datetime.now().strftime('%Y-%m-%d'))
@@ -110,16 +110,8 @@ def main():
         pdf_pages_candlestick.close()
         st.write("PDF generation complete.")
 
-    if st.button("Download PDF"):
-        with open(output_file, "rb") as f:
-            pdf_bytes = f.read()
-        b64 = base64.b64encode(pdf_bytes).decode()
-        href = f'<a href="data:application/octet-stream;base64,{b64}" download="{output_file}" target="_blank">Click here to download the PDF file</a>'
-        st.markdown(href, unsafe_allow_html=True)
-
-    uploaded_file = st.file_uploader("Upload PDF", type="pdf")
-    if uploaded_file is not None:
-        st.write("PDF file uploaded successfully.")
+        # Provide download link for the generated PDF
+        st.markdown(f"Download your PDF [here](./{output_file})")
 
 if __name__ == "__main__":
     main()
