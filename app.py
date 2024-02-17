@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 import pandas as pd
+import base64
 import matplotlib
 matplotlib.use('Agg') 
 
@@ -109,9 +110,16 @@ def main():
         pdf_pages_candlestick.close()
         st.write("PDF generation complete.")
 
-        st.write("\nDownload the generated PDF:")
-        with open(output_file, "rb") as file:
-            btn = st.download_button(label="Download PDF", data=file, file_name=output_file)
+    if st.button("Download PDF"):
+        with open(output_file, "rb") as f:
+            pdf_bytes = f.read()
+        b64 = base64.b64encode(pdf_bytes).decode()
+        href = f'<a href="data:application/octet-stream;base64,{b64}" download="{output_file}" target="_blank">Click here to download the PDF file</a>'
+        st.markdown(href, unsafe_allow_html=True)
+
+    uploaded_file = st.file_uploader("Upload PDF", type="pdf")
+    if uploaded_file is not None:
+        st.write("PDF file uploaded successfully.")
 
 if __name__ == "__main__":
     main()
