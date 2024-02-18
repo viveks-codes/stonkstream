@@ -95,7 +95,7 @@ def main():
 
     if st.button("Generate PDF"):
         st.write("\nGenerating PDF...")
-        pdf_pages_candlestick = PdfPages('/pages/'+output_file)
+        pdf_pages_candlestick = PdfPages(output_file)
 
         # Read stock symbols from the chosen CSV file
         symbols_df = pd.read_csv(csv_file)
@@ -111,7 +111,16 @@ def main():
         st.write("PDF generation complete.")
 
         # Provide download link for the generated PDF
-        st.markdown(f"Download your PDF [here](./{output_file})")
+        with open(output_file, "rb") as f:
+            pdf_bytes = f.read()
+        st.markdown(get_binary_file_downloader_html(output_file, 'PDF file'), unsafe_allow_html=True)
+
+def get_binary_file_downloader_html(bin_file, file_label='File'):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    b64 = base64.b64encode(data).decode()
+    href = f'<a href="data:application/octet-stream;base64,{b64}" download="{os.path.basename(bin_file)}">{file_label}</a>'
+    return href
 
 if __name__ == "__main__":
     main()
