@@ -95,7 +95,7 @@ def main():
 
     if st.button("Generate PDF"):
         st.write("\nGenerating PDF...")
-        pdf_pages_candlestick = PdfPages(output_file)
+        pdf_pages_candlestick = PdfPages('/pages/'+output_file)
 
         # Read stock symbols from the chosen CSV file
         symbols_df = pd.read_csv(csv_file)
@@ -111,7 +111,7 @@ def main():
         st.write("PDF generation complete.")
 
         # Provide download link for the generated PDF
-        st.markdown(f"Download your PDF [here](./pages/{output_file})")
+        st.markdown(f"Download your PDF [here](./{output_file})")
 
 if __name__ == "__main__":
     main()
