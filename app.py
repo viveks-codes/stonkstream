@@ -7,6 +7,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 import pandas as pd
 import base64 
+import numpy as np
 import matplotlib
 matplotlib.use('Agg') 
 
