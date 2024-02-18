@@ -6,8 +6,10 @@ from datetime import datetime, timedelta
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 import pandas as pd
+import base64 
 import matplotlib
 matplotlib.use('Agg') 
+
 
 def plot_candlestick_to_pdf(symbol, start_date, end_date, interval='1h', emas=(10, 50, 100), pdf_pages=None):
     try:
