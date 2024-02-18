@@ -111,7 +111,7 @@ def main():
         st.write("PDF generation complete.")
 
         # Provide download link for the generated PDF
-        st.markdown(f"Download your PDF [here](./{output_file})")
+        st.markdown(f"Download your PDF [here](./pages/{output_file})")
 
 if __name__ == "__main__":
     main()
