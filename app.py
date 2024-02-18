@@ -68,7 +68,7 @@ def parse_date_input(date_string, default_date):
 def main():
     st.title("Application Switcher")
 
-    app_selection = st.radio("Select an application:", ("Candlestick Chart Generator", "Trend Line support and resistance"))
+    app_selection = st.radio("Select an application:", ("Candlestick Chart Generator with EMAs", "Trend Line support and resistance"))
 
     if app_selection == "Candlestick Chart Generator with EMAs":
         generate_candlestick_chart()
