@@ -16,7 +16,7 @@ def plot_candlestick_to_pdf(symbol, start_date, end_date, interval='1h', emas=(1
 
         # Check if data is empty for the symbol
         if stock_data.empty:
-            st.write(f"No data available for symbol: {symbol}")
+            # st.write(f"No data available for symbol: {symbol}")
 
             # Try fetching data with '.NS' extension
             symbol_with_ns = symbol + '.NS'
@@ -24,9 +24,9 @@ def plot_candlestick_to_pdf(symbol, start_date, end_date, interval='1h', emas=(1
 
             if not stock_data_ns.empty:
                 stock_data = stock_data_ns
-                st.write(f"Using {symbol_with_ns} instead")
+                # st.write(f"Using {symbol_with_ns} instead")
             else:
-                st.write(f"No data available for {symbol_with_ns} as well")
+                st.write(f"No data available for {symbol_with_ns}")
                 return
 
         # Calculate EMAs based on user input
@@ -74,6 +74,8 @@ def main():
     elif app_selection == "Trend Line support and resistance":
         st.markdown("[Other Application Link](https://linestream-aa4eid2emajwwpt4ogv4ns.streamlit.app/)")
 
+import time
+
 def generate_candlestick_chart():
     st.sidebar.title("Candlestick Chart Generator")
 
@@ -113,25 +115,45 @@ def generate_candlestick_chart():
         symbols_df = pd.read_csv(csv_file)
         symbols = symbols_df['Symbol'].tolist()
 
+        # Initialize progress bar
+        progress_bar = st.progress(0)
+
+        # Measure time for generating PDF
+        start_time = time.time()
+        duration_ms = 0.0000
         # Loop through each symbol and plot candlestick chart
-        for symbol in symbols:
+        for i, symbol in enumerate(symbols):
+            success = st.success(symbol)
+            warning = st.warning(duration_ms)
+
             plot_candlestick_to_pdf(symbol, start_date=start_date, end_date=end_date,
                                     interval=interval, emas=emas, pdf_pages=pdf_pages_candlestick)
+            end_time = time.time()
 
+            # Update progress bar
+            progress = (i + 1) / len(symbols)
+            progress_bar.progress(progress)
+            duration_ms = (end_time - start_time) * 1000
+            
+            success.empty()
+            warning.empty()
         # Close the PDF file for candlestick charts
         pdf_pages_candlestick.close()
-        st.sidebar.write("PDF generation complete.")
+        st.write("PDF generation complete.")
+
+        # Measure the time taken and show it in milliseconds
+
 
         # Provide download link for the generated PDF
         with open(output_file, "rb") as f:
             pdf_bytes = f.read()
-        st.sidebar.markdown(get_binary_file_downloader_html(output_file, 'PDF file'), unsafe_allow_html=True)
+        st.markdown(get_binary_file_downloader_html(output_file, 'PDF file'), unsafe_allow_html=True)
 
 def get_binary_file_downloader_html(bin_file, file_label='File'):
     with open(bin_file, 'rb') as f:
         data = f.read()
     b64 = base64.b64encode(data).decode()
-    href = f'<a href="data:application/octet-stream;base64,{b64}" download="{os.path.basename(bin_file)}">{file_label}</a>'
+    href = f'<a href="data:application/octet-stream;base64,{b64}" download="{os.path.basename(bin_file)}" style="text-decoration: none; padding: 10px 20px; background-color: #4CAF50; color: white; border-radius: 5px; border: none; cursor: pointer; font-size: 16px;">{file_label}</a>'
     return href
 
 if __name__ == "__main__":
