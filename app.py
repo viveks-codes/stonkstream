@@ -34,7 +34,7 @@ def plot_candlestick_to_pdf(symbol, start_date, end_date, interval='1h', emas=(1
             stock_data[f'EMA{ema}'] = stock_data['Close'].ewm(span=ema, adjust=False).mean()
 
         # Plotting candlestick chart
-        title = f'{symbol} Chart from {start_date} to {end_date} ({interval} interval) with {", ".join([f"{ema} EMA" for ema in emas])}'
+        title = f'\n{symbol} {start_date} to {end_date} ({interval} interval),\n {", ".join([f"{ema} EMA" for ema in emas])}'
         fig, axlist = mpf.plot(stock_data, type='candle', style='yahoo', title=title,
                                ylabel='Price', ylabel_lower='Volume', mav=emas, tight_layout=False, returnfig=True)
 
@@ -43,7 +43,6 @@ def plot_candlestick_to_pdf(symbol, start_date, end_date, interval='1h', emas=(1
             ax.legend(['Close'] + [f'EMA{ema}' for ema in emas])
 
         # Adjust layout to prevent tick label cutoff
-        fig.subplots_adjust(bottom=0.2)  # You can adjust this value based on your specific case
 
         # Save the current candlestick chart plot to the PDF file
         pdf_pages.savefig(fig)
