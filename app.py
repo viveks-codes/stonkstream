@@ -98,7 +98,7 @@ def generate_candlestick_chart():
     default_start_date = (datetime.now() - timedelta(days=200)).strftime('%Y-%m-%d')
     start_date = parse_date_input(st.sidebar.text_input(f"Enter start date (YYYY-MM-DD, default: {default_start_date}): ", value=default_start_date), default_start_date)
     end_date = parse_date_input(st.sidebar.text_input(f"Enter end date (YYYY-MM-DD, default: {datetime.now().strftime('%Y-%m-%d')}): ", value=datetime.now().strftime('%Y-%m-%d')), datetime.now().strftime('%Y-%m-%d'))
-    interval_options = ["1m", "2m", "5m", "15m", "30m", "60m", "90m", "1h", "1d", "5d", "1wk", "1mo", "3mo"]
+    interval_options = ["1h", "2m", "5m", "15m", "30m", "60m", "90m", "1m", "1d", "5d", "1wk", "1mo", "3mo"]
     interval = st.sidebar.selectbox("Interval", interval_options)
 
     emas_input = st.sidebar.text_input("Enter a space-separated list of EMAs (default: 10 50 100): ", value='10 50 100')
