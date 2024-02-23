@@ -48,6 +48,9 @@ def plot_candlestick_to_pdf(symbol, start_date, end_date, interval='1h', emas=(1
         pdf_pages.savefig(fig)
         plt.close(fig)
 
+        if st.session_state.show_graph_on_page:  # Check if radio button is selected to show graph on page
+            st.pyplot(fig)
+
     except Exception as e:
         st.write(f"Error processing symbol {symbol}: {str(e)}")
 
@@ -66,7 +69,6 @@ def parse_date_input(date_string, default_date):
 
 def main():
     st.title("Application Switcher")
-
     app_selection = st.radio("Select an application:", ("Candlestick Chart Generator with EMAs", "Trend Line support and resistance"))
 
     if app_selection == "Candlestick Chart Generator with EMAs":
@@ -106,6 +108,9 @@ def generate_candlestick_chart():
     emas_input = st.sidebar.text_input("Enter a space-separated list of EMAs (default: 10 50 100): ", value='10 50 100')
     emas = parse_emas_input(emas_input)
     output_file = st.sidebar.text_input("Enter output PDF file name (default: 'candlestick_charts_all_symbols.pdf'): ", value='candlestick_charts_all_symbols.pdf')
+
+    st.sidebar.write("\nShow Graph on Page:")
+    st.sidebar.radio("", options=[True, False], key="show_graph_on_page")  # Radio button for showing graph on page
 
     if st.sidebar.button("Generate PDF"):
         st.sidebar.write("\nGenerating PDF...")
