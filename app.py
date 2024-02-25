@@ -8,6 +8,21 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import base64 
 import matplotlib
+
+from flask import Flask, request, send_file
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import schedule
+import time
+
+from email.mime.base import MIMEBase
+from base64 import *
+from email import encoders  
+
+app = Flask(__name__)
+
+
 matplotlib.use('Agg') 
 
 def plot_candlestick_to_pdf(symbol, start_date, end_date, interval='1h', emas=(10, 50, 100), pdf_pages=None):
@@ -161,5 +176,115 @@ def get_binary_file_downloader_html(bin_file, file_label='File'):
     href = f'<a href="data:application/octet-stream;base64,{b64}" download="{os.path.basename(bin_file)}" style="text-decoration: none; padding: 10px 20px; background-color: #4CAF50; color: white; border-radius: 5px; border: none; cursor: pointer; font-size: 16px;">{file_label}</a>'
     return href
 
-if __name__ == "__main__":
-    main()
+
+
+
+
+#app = Flask(__name__)
+
+from datetime import datetime, timedelta
+
+def generate_pdf():
+    # Code to generate the PDF
+    # Replace this with your actual code to generate the PDF
+    current_date = datetime.now().date()
+    start_date = (current_date - timedelta(days=365)).isoformat()  # End date - 1 year
+    end_date = current_date.isoformat()  # Current date
+
+    plot_candlestick_to_pdf("AIAENG.ns", start_date=start_date, end_date="2024-02-02", interval='1h', emas=(10, 50, 100), pdf_pages=None)
+
+
+    # For demonstration, let's just create an empty PDF file
+    with open('output.pdf', 'w') as f:
+        pass
+
+def send_email():
+    # Your email credentials
+    email_address ="ai20.vivek.patel@gmail.com"
+    app_password = "kqqlidxznooglxpt"
+
+    # Get recipient email address
+    recipient_email = "vritika.f2002@gmail.com"
+
+    # Setup the MIME
+    message = MIMEMultipart()
+    message['From'] = email_address
+    message['To'] = recipient_email
+    message['Subject'] = "Daily Report"
+    body = "Please find attached the daily report."
+    message.attach(MIMEText(body, 'plain'))
+
+    # Attach the PDF file
+    with open('output.pdf', 'rb') as attachment:
+        part = MIMEBase('application', 'octet-stream')
+        part.set_payload(attachment.read())
+    encoders.encode_base64(part)
+    part.add_header('Content-Disposition', 'attachment; filename="output.pdf"')
+    message.attach(part)
+
+    # Connect to Gmail's SMTP server
+    with smtplib.SMTP('smtp.gmail.com', 587) as server:
+        server.starttls()
+        server.login(email_address, app_password)
+        text = message.as_string()
+        server.sendmail(email_address, recipient_email, text)
+
+
+@app.route('/get_pdf')
+def get_pdf():
+            return send_file('output.pdf', as_attachment=True)
+
+
+
+app = Flask(__name__)
+
+def generate_pdf():
+    current_date = datetime.now().date()
+    start_date = (current_date - timedelta(days=1)).isoformat()  # Start date = Current date - 1 day
+    end_date = current_date.isoformat()  # Current date
+
+    # Call your function to generate the PDF with the specified start and end dates
+    plot_candlestick_to_pdf("AIAENG.ns", start_date=start_date, end_date=end_date, interval='1h', emas=(10, 50, 100), pdf_pages=None)
+
+def send_email():
+    email_address = "ai20.vivek.patel@gmail.com"
+    app_password = "kqql idxz noog lxpt"
+
+    recipient_email = "vritika.f2002@gmail.com"
+
+    message = MIMEMultipart()
+    message['From'] = email_address
+    message['To'] = recipient_email
+    message['Subject'] = "Daily Report"
+    body = "Please find attached the daily report."
+    message.attach(MIMEText(body, 'plain'))
+
+    with open('output.pdf', 'rb') as attachment:
+        part = MIMEBase('application', 'octet-stream')
+        part.set_payload(attachment.read())
+    encoders.encode_base64(part)
+    part.add_header('Content-Disposition', 'attachment; filename="output.pdf"')
+    message.attach(part)
+
+    with smtplib.SMTP('smtp.gmail.com', 587) as server:
+        server.starttls()
+        server.login(email_address, app_password)
+        text = message.as_string()
+        server.sendmail(email_address, recipient_email, text)
+
+@app.route('/get_pdf')
+def get_pdf():
+    return send_file('output.pdf', as_attachment=True)
+
+if __name__ == '__main__':
+    # Schedule the PDF generation and email sending at 1:45 PM every day
+    schedule.every().day.at("16:16").do(generate_pdf)
+    schedule.every().day.at("16:17").do(send_email)
+
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+    # Run the Flask app
+    app.run(debug=True)
+
